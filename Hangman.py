@@ -7,25 +7,80 @@ import random
 class Hangman:
 	def __init__(self):
 		dic = open("Dictionary.txt", "r")
-		word  = self.chooseWord(dic)
+		self.word  = self.choose_word(dic)
+		self.blank_word = "_" * len(self.word)
+		self.MAX_INCORRECT = 5
+		self.incorrect = 0
 
-	def chooseWord(self, dictionary):
-		listofwords = []
+	def choose_word(self, dictionary):
+		list_of_words = []
 		for line in dictionary.readlines():
-			listofwords.append(line)
-		return listofwords[random.randint(0, len(listofwords))].strip()
+			list_of_words.append(line)
+		return list_of_words[random.randint(0, len(list_of_words))].strip()
+
+	def subsitute_blanks(self, guess):
+		guess = guess.lower()
+		correct_guess = False
+		new_blank = ""
+		for i in range(0,len(self.word)):
+			if(guess == self.word[i]):
+				correct_guess = True
+				new_blank += guess
+			else:
+				new_blank += self.blank_word[i]
+		self.blank_word = new_blank
+		return correct_guess
 
 	def play(self):
-		print("PLAYING!")
+		win = False
+		while(not win):
+			print(self.blank_word)
+			guess = input("Please give me your guess: ")
+
+			if(len(guess) == 1):
+				if(self.subsitute_blanks(guess)):
+					print("Congrats! You've got a letter!")
+				else:
+					print("Nope! Try again!")
+					self.incorrect += 1
+
+			else:
+				if(guess == self.word):
+					self.blank_word = self.word
+				else:
+					print("Nope! Try again!")
+					self.incorrect += 1
+
+			if(self.blank_word == self.word):
+				print("Congrats! You won!!!")
+				win = True
+
+			elif(self.incorrect == self.MAX_INCORRECT):
+				print("Sorry! You ran out of guesses! The correct answer was " + self.word)
+				win = True
+			else:
+				print("You have " + str(self.incorrect) + " guesses out of " + str(self.MAX_INCORRECT) + " guesses.")
 
 if(__name__ == "__main__"):
-	playgame = ""
-	while(playgame != "y" and playgame != "n"):
-		playgame = input("Hello, woud you like to play a game of Hangman? (y/n)")
+	play_game = ""
+	while(play_game != "y" and play_game != "n"):
+		play_game = input("Hello, woud you like to play a game of Hangman? (y/n)")
 
-	if(playgame == "y"):
-		game = Hangman()
-		game.play()
+	if(play_game == "y"):
+		more = True
+		while(more):
+			game = Hangman()
+			game.play()
+
+			while(more != "y" and more != "n"):
+				more = input("Hello, woud you like to play another game of Hangman? (y/n)")
+
+			if(more == "y"):
+				more = True
+			else:
+				more = False
+
+
 
 	else:
 		print("Aw :(")
